@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Games{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Track games you've played.<br>Save those you want to play.<br>Tell your friends what's good.</h1>
+  <form class="search" method="get" action="{{ url_for('index') }}">
+    <input type="search" name="q" value="{{ q }}" placeholder="Search by title, genre or platform…" autofocus>
+    <button type="submit">Search</button>
+  </form>
+</section>
+
+{% if q %}<p class="muted">{{ games|length }} result{{ '' if games|length == 1 else 's' }} for “{{ q }}” · <a href="{{ url_for('index') }}">clear</a></p>{% endif %}
+
+{% if games %}
+<div class="grid">
+  {% for game in games %}
+  <a class="card" href="{{ url_for('game_detail', game_id=game.id) }}">
+    {% include "_cover.html" %}
+    <div class="card-body">
+      <div class="card-title">{{ game.title }}</div>
+      <div class="muted small">{{ game.year or '' }}{% if game.genre %} · {{ game.genre }}{% endif %}</div>
+      {% if game.rating %}<div class="stars">{{ game.rating | stars }}</div>
+      {% elif game.wanted %}<div class="badge">Want to play</div>{% endif %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="empty">No games found. <a href="{{ url_for('add_game') }}">Add it to the catalog?</a></p>
+{% endif %}
+{% endblock %}

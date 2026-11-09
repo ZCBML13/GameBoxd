@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ game.title }}{% endblock %}
+{% block content %}
+<div class="game-page">
+  <div class="game-side">{% include "_cover.html" %}</div>
+  <div class="game-main">
+    <h1>{{ game.title }} {% if game.year %}<span class="muted year">{{ game.year }}</span>{% endif %}</h1>
+    <p class="muted">
+      {% if game.genre %}{{ game.genre }}{% endif %}
+      {% if game.platforms %} · {{ game.platforms }}{% endif %}
+    </p>
+
+    <div class="panel">
+      <h2>{{ 'Your review' if log else 'Rate this game' }}</h2>
+      {% if log %}
+        <p class="muted small">Logged {{ log.logged_at | prettydate }}</p>
+      {% endif %}
+      <form method="post" action="{{ url_for('log_game', game_id=game.id) }}" class="review-form">
+        <label for="rating">Rating (out of 5)</label>
+        <div class="star-input" data-target="rating" aria-hidden="true">
+          {% for i in range(1, 6) %}<span class="star" data-value="{{ i }}">★</span>{% endfor %}
+          <span class="star-readout"></span>
+        </div>
+        <select id="rating" name="rating" required>
+          <option value="" disabled {{ 'selected' if not log }}>Choose…</option>
+          {% for r in ratings|reverse %}
+            <option value="{{ '%g' % r }}" {{ 'selected' if log and log.rating == r }}>{{ r | stars }} ({{ '%g' % r }})</option>
+          {% endfor %}
+        </select>
+
+        <label for="comment">Comment <span class="muted">(optional)</span></label>
+        <textarea id="comment" name="comment" rows="4" placeholder="What did you think?">{{ log.comment if log and log.comment else '' }}</textarea>
+
+        <div class="actions">
+          <button type="submit">{{ 'Update review' if log else 'Log as played' }}</button>
+        </div>
+      </form>
+      {% if log %}
+      <form method="post" action="{{ url_for('delete_log', game_id=game.id) }}" onsubmit="return confirm('Remove your review?');">
+        <button type="submit" class="link danger">Remove review</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if not log %}
+    <form method="post" action="{{ url_for('toggle_want', game_id=game.id) }}">
+      <button type="submit" class="{{ 'secondary' if wanted else 'outline' }}">
+        {{ '✓ On your Want to Play list (remove)' if wanted else '+ Add to Want to Play' }}
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Clickable stars: click the left half of a star for a half rating.
+document.querySelectorAll('.star-input').forEach(function (widget) {
+  var select = document.getElementById(widget.dataset.target);
+  var stars = widget.querySelectorAll('.star');
+  var readout = widget.querySelector('.star-readout');
+  select.classList.add('visually-hidden');
+  widget.removeAttribute('aria-hidden');
+  widget.style.display = 'flex';
+
+  function paint(value) {
+    stars.forEach(function (s) {
+      var v = Number(s.dataset.value);
+      s.classList.toggle('full', value >= v);
+      s.classList.toggle('half', value === v - 0.5);
+    });
+    readout.textContent = value ? value + ' / 5' : '';
+  }
+  function valueFor(star, event) {
+    var rect = star.getBoundingClientRect();
+    var v = Number(star.dataset.value);
+    return (event.clientX - rect.left) < rect.width / 2 ? v - 0.5 : v;
+  }
+  stars.forEach(function (star) {
+    star.addEventListener('mousemove', function (e) { paint(valueFor(star, e)); });
+    star.addEventListener('click', function (e) { select.value = String(valueFor(star, e)); paint(Number(select.value)); });
+  });
+  widget.addEventListener('mouseleave', function () { paint(Number(select.value) || 0); });
+  paint(Number(select.value) || 0);
+});
+</script>
+{% endblock %}

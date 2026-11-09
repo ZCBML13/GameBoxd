@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}GameBoxd{% endblock %} · GameBoxd</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="{{ url_for('index') }}"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>GameBoxd</a>
+    <nav>
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">Games</a>
+      <a href="{{ url_for('played') }}" class="{{ 'active' if request.endpoint == 'played' }}">Played <span class="count">{{ played_count }}</span></a>
+      <a href="{{ url_for('want_list') }}" class="{{ 'active' if request.endpoint == 'want_list' }}">Want to Play <span class="count">{{ want_count }}</span></a>
+      <a href="{{ url_for('add_game') }}" class="{{ 'active' if request.endpoint == 'add_game' }}">+ Add game</a>
+    </nav>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

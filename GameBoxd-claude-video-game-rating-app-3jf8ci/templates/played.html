@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Played{% endblock %}
+{% block content %}
+<div class="list-header">
+  <div>
+    <h1>Played</h1>
+    <p class="muted">{{ entries|length }} game{{ '' if entries|length == 1 else 's' }}{% if avg %} · average {{ '%.1f' % avg }} / 5{% endif %}</p>
+  </div>
+  <div class="sort">
+    <span class="muted small">Sort by</span>
+    {% for key, opt in sort_options.items() %}
+      <a href="{{ url_for('played', sort=key) }}" class="pill {{ 'active' if sort == key }}">{{ opt[0] }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if entries %}
+<ul class="diary">
+  {% for e in entries %}
+  <li>
+    <span class="date muted small">{{ e.logged_at | prettydate }}</span>
+    <div class="entry">
+      <a class="title" href="{{ url_for('game_detail', game_id=e.id) }}">{{ e.title }}</a>
+      <span class="muted small">{{ e.year or '' }}</span>
+      <div class="stars">{{ e.rating | stars }}</div>
+      {% if e.comment %}<p class="comment">{{ e.comment }}</p>{% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty">You haven't logged any games yet. <a href="{{ url_for('index') }}">Find one to rate.</a></p>
+{% endif %}
+{% endblock %}

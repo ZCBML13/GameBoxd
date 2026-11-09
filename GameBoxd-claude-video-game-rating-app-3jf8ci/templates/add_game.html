@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Add a game{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h1>Add a game</h1>
+  <p class="muted">Can't find a game? Add it to the catalog.</p>
+  <form method="post" class="review-form">
+    <label for="title">Title</label>
+    <input id="title" name="title" required value="{{ form.get('title', '') }}">
+    <label for="year">Release year</label>
+    <input id="year" name="year" inputmode="numeric" placeholder="e.g. 2024" value="{{ form.get('year', '') }}">
+    <label for="genre">Genre</label>
+    <input id="genre" name="genre" placeholder="e.g. RPG" value="{{ form.get('genre', '') }}">
+    <label for="platforms">Platforms</label>
+    <input id="platforms" name="platforms" placeholder="e.g. PC, PS5, Switch" value="{{ form.get('platforms', '') }}">
+    <div class="actions"><button type="submit">Add game</button></div>
+  </form>
+</div>
+{% endblock %}

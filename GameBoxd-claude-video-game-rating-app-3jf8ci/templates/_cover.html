@@ -1,0 +1,5 @@
+{# A generated "cover" tile so every game has some art without needing images. #}
+{% set hue = (game.title | length * 37 + game.id * 53) % 360 %}
+<div class="cover" style="--hue: {{ hue }}">
+  <span>{{ game.title }}</span>
+</div>
